@@ -1,0 +1,10 @@
+baseEstimate            Estimating Projection Matrices
+dataGenerate            Generating Original Data
+ensemble                Estimating Ensemble Kernel Matrices
+genericFormula          From Vectors to Single Variables
+infoMat                 Computing Information Matrices
+kernelGenerate          Generating A Single Kernel
+kernelTest              Conducting Score Tests for Interaction
+multiScore              Computing Score Test Statistics.
+noiseEstimate           Estimating Noise
+tuning                  Calculating Tuning Parameters
