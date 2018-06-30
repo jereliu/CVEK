@@ -10,7 +10,7 @@ Description: Using a library of base kernels, it learns a proper
   model’s cross-validation error, therefore guaranteeing robust test 
   for a wide range of data-generating functions.
 Depends: R (>= 3.0.1), mvtnorm, MASS, psych, limSolve
-License: MIT + file LICENSE
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
