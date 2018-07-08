@@ -53,7 +53,9 @@ y^{\star T}(I-A_\lambda)y^\star-\frac{1}{n-1}log \mid I-A_\lambda \mid
 }
 \examples{
 
+
 ##tuning(Y, K_mat = K, mode = "loocv", lambda = exp(seq(-5, 5)))
+
 
 }
 \references{

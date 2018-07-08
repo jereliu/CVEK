@@ -20,14 +20,17 @@ matrix.}
 \item{K_hat}{Estimated ensemble kernel matrix.}
 }
 \value{
-\item{sigma2_hat}{The estimated noise.}
+\item{sigma2_hat}{The estimated noise of the fixed effects.}
 }
 \description{
 An implementation of Gaussian processes for estimating noise.
 }
 \examples{
 
+
 ##sigma2_hat <- noiseEstimate(y, lam, beta0, alpha0, K_gpr)
+
+
 }
 \references{
 Jeremiah Zhe Liu and Brent Coull. Robust Hypothesis Test for

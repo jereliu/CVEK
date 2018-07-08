@@ -13,12 +13,8 @@
 #' @author Wenying Deng
 #' @examples
 #'
-#'
 #' ##generic_formula0 <- genericFormula(formula = Y ~ X1 + X2,
 #' ##label_names = list(X1 = c("x1", "x2"), X2 = c("x3", "x4")))
-#'
-#'
-#' @export genericFormula
 genericFormula <-
   function(formula, label_names){
 
@@ -57,10 +53,6 @@ genericFormula <-
 
 
 
-
-
-
-
 #' Generating Original Data
 #'
 #' Generate original data based on specific kernels.
@@ -83,11 +75,9 @@ genericFormula <-
 #' @author Wenying Deng
 #' @examples
 #'
-#'
 #' ##data <- dataGenerate(size = 50, label_names =
 #' ##list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
 #' ##method = "rbf", int_effect = 0, l = 1, p = 2, eps = 0.01)
-#'
 #'
 #' @export dataGenerate
 dataGenerate <-
@@ -142,10 +132,6 @@ dataGenerate <-
 
 
 
-
-
-
-
 #' Estimating Noise
 #'
 #' An implementation of Gaussian processes for estimating noise.
@@ -158,17 +144,13 @@ dataGenerate <-
 #' @param alpha_hat Estimated coefficients of the estimated ensemble kernel
 #' matrix.
 #' @param K_hat Estimated ensemble kernel matrix.
-#' @return \item{sigma2_hat}{The estimated noise of the fixed effects.}
+#' @return \item{sigma2_hat}{The estimated noise.}
 #' @author Wenying Deng
 #' @references Jeremiah Zhe Liu and Brent Coull. Robust Hypothesis Test for
 #' Nonlinear Effect with Gaus- sian Processes. October 2017.
 #' @examples
 #'
-#'
 #' ##sigma2_hat <- noiseEstimate(y, lam, beta0, alpha0, K_gpr)
-#'
-#'
-#' @export noiseEstimate
 noiseEstimate <- function(Y, lambda_hat, beta_hat, alpha_hat, K_hat){
 
   n <- nrow(K_hat)
@@ -184,24 +166,24 @@ noiseEstimate <- function(Y, lambda_hat, beta_hat, alpha_hat, K_hat){
 
 
 
-
-
-
-
 #' Computing Score Test Statistics.
 #'
 #' Compute score test statistics.
 #'
 #' The test statistic is distributed as a scaled Chi-squared distribution.
 #'
-#' @param n A numeric number specifying the number of observations.
-#' @param Y Reponses of the dataframe.
-#' @param X12 The interaction items of first and second types of factors in the
-#' dataframe.
-#' @param beta0 Estimated bias of the model.
-#' @param sigma2_hat The estimated noise of the fixed effects.
-#' @param tau_hat The estimated noise of the random effects.
-#' @param K_gpr Estimated ensemble kernel matrix.
+#' @param formula_int A symbolic description of the model with interaction.
+#' @param label_names A character string indicating all the interior variables
+#' included in each predictor.
+#' @param Kernlist The kernel library containing several kernels given by user.
+#' @param data A dataframe to be fitted.
+#' @param mode A character string indicating which tuning parameter criteria is
+#' to be used.
+#' @param strategy A character string indicating which ensemble strategy is to
+#' be used.
+#' @param beta A numeric value specifying the parameter when strategy = "exp".
+#' @param lambda A numeric string specifying the range of noise to be chosen.
+#' The lower limit of lambda must be above 0.
 #' @return \item{test_stat}{The computed test statistic.}
 #' @author Wenying Deng
 #' @references Arnab Maity and Xihong Lin. Powerful tests for detecting a gene
@@ -209,11 +191,13 @@ noiseEstimate <- function(Y, lambda_hat, beta_hat, alpha_hat, K_hat){
 #' kernel machines. December 2011.
 #' @examples
 #'
+#' ##multiScore(formula_int = Y ~ X1 + X2 + X1 * X2,
+#' ##label_names = list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
+#' ##Kernlist = Kernlist, data = data, mode = "loocv",
+#' ##strategy = "erm", test = "boot",
+#' ##lambda = exp(seq(-5, 5)))
 #'
-#' ##scoreStat(n, Y, X12, beta0, sigma2_hat, tau_hat, K_gpr)
-#'
-#'
-#' @export scoreStat
+#' @export multiScore
 scoreStat <-
   function(n, Y, X12, beta0, sigma2_hat, tau_hat, K_gpr){
 
@@ -222,15 +206,11 @@ scoreStat <-
 
     V0_inv <- ginv(tau_hat * K0 + sigma2_hat * diag(n))
 
-    test_stat <- tau_hat * t(Y - beta0) %*% V0_inv %*%
-      K12 %*% V0_inv %*% (Y - beta0) / 2
+    test_stat <- tau_hat * t(y - beta0) %*% V0_inv %*%
+      K12 %*% V0_inv %*% (y - beta0) / 2
 
     return(test_stat)
   }
-
-
-
-
 
 
 #' Computing Information Matrices
@@ -253,12 +233,8 @@ scoreStat <-
 #' kernel machines. December 2011.
 #' @examples
 #'
-#'
 #' ##I0 <- infoMat(P0_mat, mat_del = drV0_del,
 #' ##mat_sigma2 = drV0_sigma2, mat_tau = drV0_tau)
-#'
-#'
-#' @export infoMat
 infoMat <-
   function(P0_mat, mat_del = NULL, mat_sigma2 = NULL, mat_tau = NULL){
     I0 <- matrix(NA, 3, 3)

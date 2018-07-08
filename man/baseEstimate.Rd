@@ -45,8 +45,10 @@ errors.
 }
 \examples{
 
+
 ##baseEstimate(size = 50, magn = 3, Y, X1, X2, Kernlist = NULL,
 ##mode = "loocv", lambda = exp(seq(-5, 5)))
+
 
 }
 \references{

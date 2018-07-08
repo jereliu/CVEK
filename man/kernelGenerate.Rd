@@ -4,7 +4,7 @@
 \alias{kernelGenerate}
 \title{Generating A Single Kernel}
 \usage{
-kernelGenerate(method = "rbf", Sigma = NULL, l = 1, p = 2)
+kernelGenerate(method = "rbf", Sigma = 0, l = 1, p = 2)
 }
 \arguments{
 \item{method}{A character string indicating which kernel is to be computed.}
@@ -46,12 +46,14 @@ x')=\frac{2}{\pi}sin^{-1}\Big(\frac{2\tilde{x}^T\Sigma
 }
 \examples{
 
-##kernelGenerate(method = "rbf", Sigma = NULL, l = 1, p = 2)
+
+##kernelGenerate(method = "rbf", Sigma = 0, l = 1, p = 2)
 
 ##Kernlist <- NULL
 ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = .6))
 ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = 1))
 ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = 2))
+
 
 }
 \references{

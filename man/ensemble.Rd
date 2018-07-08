@@ -4,45 +4,31 @@
 \alias{ensemble}
 \title{Estimating Ensemble Kernel Matrices}
 \usage{
-ensemble(formula, label_names, Kernlist, data, mode, strategy, beta, lambda)
+ensemble(n, D, strategy, beta, error_mat, A_hat)
 }
 \arguments{
-\item{formula}{A symbolic description of the model to be fitted.}
+\item{n}{A numeric number specifying the number of observations.}
 
-\item{label_names}{A character string indicating all the interior variables
-included in each predictor.}
-
-\item{Kernlist}{The kernel library containing several kernels given by user.}
-
-\item{data}{A dataframe to be fitted.}
-
-\item{mode}{A character string indicating which tuning parameter criteria is
-to be used.}
+\item{D}{A numeric number specifying the number of kernels in the kernel
+library.}
 
 \item{strategy}{A character string indicating which ensemble strategy is to
 be used.}
 
 \item{beta}{A numeric value specifying the parameter when strategy = "exp".}
 
-\item{lambda}{A numeric string specifying the range of noise to be chosen.
-The lower limit of lambda must be above 0.}
+\item{error_mat}{A n*D matrix indicating errors.}
+
+\item{A_hat}{A list of projection matrices for every kernels in the kernel
+library.}
 }
 \value{
-\item{lam}{The selected tuning parameter based on the estimated
-ensemble kernel matrix.}
-
-\item{intercept}{Estimated bias of the model.}
-
-\item{alpha}{Estimated coefficients of the estimated ensemble kernel
-matrix.}
-
-\item{K}{Estimated ensemble kernel matrix.}
+\item{A_est}{A list of estimated kernel matrices.}
 
 \item{u_hat}{A vector of weights of the kernels in the library.}
 }
 \description{
-Conduct gaussian process regression based on the estimated ensemble kernel
-matrix.
+Give a list of estimated kernel matrices and their weights.
 }
 \details{
 There are three ensemble strategies available here:
@@ -71,18 +57,12 @@ based on the estimated errors \eqn{\{\hat{\epsilon}_d\}_{d=1}^D}.
 \deqn{u_d(\beta)=\frac{exp(-\parallel \hat{\epsilon}_d
 \parallel_2^2/\beta)}{\sum_{d=1}^Dexp(-\parallel \hat{\epsilon}_d
 \parallel_2^2/\beta)}}
-
-Then we can calculate the outpur of gaussian process regression, the
-solution is given by \deqn{\hat{\beta}=[1^T(K+\lambda
-I)^{-1}1]^{-1}1^T(K+\lambda I)^{-1}y} \deqn{\hat{\alpha}=(K+\lambda
-I)^{-1}(y-\hat{\beta}1)} where \eqn{\beta=intercept}.
 }
 \examples{
 
-##ensemble(formula = Y ~ X1 + X2,
-##label_names = list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
-##Kernlist = Kernlist, data = data, mode = "loocv",
-##strategy = "erm", beta = 1, lambda = exp(seq(-5, 5)))
+
+##ensemble(n = 50, D = 6, strategy = "erm", beta = 1, error_mat, A_hat)
+
 
 }
 \references{
@@ -96,6 +76,9 @@ analysis. December 2017.
 Arnak S. Dalalyan and Alexandre B. Tsybakov. Aggregation by Exponential
 Weighting and Sharp Oracle Inequalities. In Learning Theory, Lecture Notes
 in Computer Science, pages 97– 111. Springer, Berlin, Heidelberg, June 2007.
+}
+\seealso{
+mode: \code{\link{tuning}}
 }
 \author{
 Wenying Deng

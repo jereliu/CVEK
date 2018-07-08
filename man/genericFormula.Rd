@@ -23,8 +23,11 @@ Transform format of predictors from vectors to single variables.
 }
 \examples{
 
+
 ##generic_formula0 <- genericFormula(formula = Y ~ X1 + X2,
 ##label_names = list(X1 = c("x1", "x2"), X2 = c("x3", "x4")))
+
+
 }
 \author{
 Wenying Deng

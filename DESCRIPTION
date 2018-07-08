@@ -1,6 +1,6 @@
 Package: CVEK
 Title: Cross-Validated Kernel Ensemble
-Version: 0.1-0
+Version: 0.2-0
 Date: 2018-06-27
 Authors@R: c(person("Wenying", "Deng", role = c("aut", "cre"),
                      email = "wdeng@hsph.harvard.edu"),

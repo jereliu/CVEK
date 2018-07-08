@@ -1,10 +1,12 @@
 baseEstimate	baseEstimate
 dataGenerate	dataGenerate
+defineModel	defineModel
 ensemble	ensemble
+estimation	estimation
 genericFormula	genericFormula
 infoMat	infoMat
 kernelGenerate	kernelGenerate
-kernelTest	kernelTest
-multiScore	multiScore
 noiseEstimate	noiseEstimate
+scoreStat	scoreStat
+testing	testing
 tuning	tuning

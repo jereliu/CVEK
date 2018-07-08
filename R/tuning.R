@@ -58,7 +58,9 @@
 #' information criterion. January 2002.
 #' @examples
 #' 
+#' 
 #' ##tuning(Y, K_mat = K, mode = "loocv", lambda = exp(seq(-5, 5)))
+#' 
 #' 
 #' @export tuning
 tuning <-

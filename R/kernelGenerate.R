@@ -1,27 +1,27 @@
 #' Generating A Single Kernel
-#' 
+#'
 #' Generate kernels for the kernel library.
-#' 
+#'
 #' There are seven kinds of kernel available here. For convenience, we define
 #' \eqn{r=\mid x-x'\mid}.
-#' 
+#'
 #' \bold{Gaussian RBF Kernels} \deqn{k_{SE}(r)=exp\Big(-\frac{r^2}{2l^2}\Big)}
-#' 
+#'
 #' \bold{Matern Kernels}
 #' \deqn{k_{Matern}(r)=\frac{2^{1-\nu}}{\Gamma(\nu)}\Big(\frac{\sqrt{2\nu
 #' r}}{l}\Big)^\nu K_\nu \Big(\frac{\sqrt{2\nu r}}{l}\Big)}
-#' 
+#'
 #' \bold{Rational Quadratic Kernels} \deqn{k_{RQ}(r)=\Big(1+\frac{r^2}{2\alpha
 #' l^2}\Big)^{-\alpha}}
-#' 
+#'
 #' \bold{Polynomial Kernels} \deqn{k(x, x')=(x \cdot x')^p} We have intercept
 #' kernel when \eqn{p=0}, and linear kernel when \eqn{p=1}.
-#' 
+#'
 #' \bold{Neural Network Kernels} \deqn{k_{NN}(x,
 #' x')=\frac{2}{\pi}sin^{-1}\Big(\frac{2\tilde{x}^T\Sigma
 #' \tilde{x}'}{\sqrt{(1+2\tilde{x}^T\Sigma \tilde{x})(1+2\tilde{x}'^T\Sigma
 #' \tilde{x}')}}\Big)}
-#' 
+#'
 #' @param method A character string indicating which kernel is to be computed.
 #' @param Sigma The covariance matrix for neural network kernel.
 #' @param l A numeric number indicating the hyperparameter (flexibility) of a
@@ -32,19 +32,21 @@
 #' @author Wenying Deng
 #' @references The MIT Press. Gaussian Processes for Machine Learning, 2006.
 #' @examples
-#' 
-#' ##kernelGenerate(method = "rbf", Sigma = NULL, l = 1, p = 2)
-#' 
+#'
+#'
+#' ##kernelGenerate(method = "rbf", Sigma = 0, l = 1, p = 2)
+#'
 #' ##Kernlist <- NULL
 #' ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = .6))
 #' ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = 1))
 #' ##Kernlist <- c(Kernlist, kernelGenerate('rbf', l = 2))
-#' 
+#'
+#'
 #' @export kernelGenerate
 #'
 #' @import mvtnorm MASS psych limSolve stats
 kernelGenerate <-
-  function(method = "rbf", Sigma = NULL, l = 1, p = 2){
+  function(method = "rbf", Sigma = 0, l = 1, p = 2){
 
     if (method == "intercept")
       SE <- function(xp, xq, Sigma, l, p) 1
@@ -76,7 +78,7 @@ kernelGenerate <-
       SE <- function(xp, xq, Sigma, l, p){
         xp <- c(1, xp)
         xq <- c(1, xq)
-        if(is.null(Sigma)) Sigma <- diag(length(xp))
+        if(Sigma == 0) Sigma <- diag(length(xp))
         s <- 2 * t(xp) %*% Sigma %*% xq / (sqrt((1 + 2 * t(xp) %*% Sigma %*% xp)
                                                 * (1 + 2 * t(xq) %*% Sigma %*% xq)))
         k_n <- asin(s)

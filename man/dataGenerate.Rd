@@ -38,9 +38,11 @@ sampled functions have been standardized to have unit norm.
 }
 \examples{
 
+
 ##data <- dataGenerate(size = 50, label_names =
 ##list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
 ##method = "rbf", int_effect = 0, l = 1, p = 2, eps = 0.01)
+
 
 }
 \author{

@@ -29,8 +29,11 @@ This function gives the information value of the interaction strength.
 }
 \examples{
 
+
 ##I0 <- infoMat(P0_mat, mat_del = drV0_del,
 ##mat_sigma2 = drV0_sigma2, mat_tau = drV0_tau)
+
+
 }
 \references{
 Arnab Maity and Xihong Lin. Powerful tests for detecting a gene
