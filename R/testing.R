@@ -68,6 +68,8 @@ testing <- function(formula_int, label_names, Y, X1, X2, Kernlist,
   re <- genericFormula(formula_int, label_names)
   generic_formula0 <- re$generic_formula
   len <- re$length_main
+  data <- as.data.frame(cbind(Y, X1, X2))
+  colnames(data) <- c("Y", label_names[[1]], label_names[[2]])
   X <- model.matrix(generic_formula0, data)[, -1]
   X12 <- X[, c((len + 1):dim(X)[2])]
   n <- length(Y)
