@@ -39,6 +39,16 @@
 #' @param B (integer) A numeric value indicating times of resampling w
 #' hen test = "boot".
 #' @return \item{pvalue}{(numeric) p-value of the test.}
+#' \item{u_weight}{(numeric) p-value of the test.}
+#' \item{lam}{(numeric) p-value of the test.}
+#' \item{train_RMSE}{(numeric) p-value of the test.}
+#' \item{test_RMSE}{(numeric) p-value of the test.}
+#' \item{K_tr}{(numeric) p-value of the test.}
+#' \item{A_tr}{(numeric) p-value of the test.}
+#' \item{V0_inv_tr}{(numeric) p-value of the test.}
+#' \item{K_gpr}{(numeric) p-value of the test.}
+#' \item{A}{(numeric) p-value of the test.}
+#' \item{V0_inv}{(numeric) p-value of the test.}
 #' @author Wenying Deng
 #' @seealso method: \code{\link{generate_kernel}}
 #'
@@ -68,7 +78,8 @@
 
 testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
                     mode = "loocv", strategy = "erm", beta = 1,
-                    test = "boot", lambda = exp(seq(-5, 5)), B = 100) {
+                    test = "boot", lambda = exp(seq(-5, 5)), 
+                    B = 100, data_test = NULL, fit_test = NULL) {
   
   re <- generate_formula(formula_int, label_names)
   generic_formula0 <- re$generic_formula
@@ -84,16 +95,53 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   beta0 <- result[[2]]
   alpha0 <- result[[3]]
   K_gpr <- result[[4]]
-  # u_weight <- result[[5]]
-  sigma2_hat <- estimate_noise(Y, lam, beta0, alpha0, K_gpr)
-  tau_hat <- sigma2_hat / lam
+  u_weight <- result[[5]]
+  noise_hat <- estimate_noise(Y, lam, beta0, alpha0, K_gpr)
+  tau_hat <- noise_hat$sigma2_hat / lam
   
   test <- match.arg(test, c("asym", "boot"))
   func_name <- paste0("test_", test)
-  do.call(func_name, list(n = n, Y = Y, X12 = X12, 
-                          beta0 = beta0, alpha0 = alpha0,
-                          K_gpr = K_gpr, sigma2_hat = sigma2_hat, 
-                          tau_hat = tau_hat, B = B))
+  
+  pvalue <- do.call(func_name, list(n = n, Y = Y, X12 = X12, 
+                                    beta0 = beta0, alpha0 = alpha0,
+                                    K_gpr = K_gpr, sigma2_hat = sigma2_hat, 
+                                    tau_hat = tau_hat, B = B))
+  
+  if (!is.null(data_test) & !is.null(fit_test)) {
+    
+    kern_size <- length(kern_list)
+    K_test <- NULL
+    for (d in seq(kern_size)) {
+      kern <- kern_list[[d]]
+      K1_m <- kern(fit_test$X1, X1)
+      K2_m <- kern(fit_test$X2, X2)
+      
+      if (tr(K1_m) > 0 & tr(K2_m) > 0) {
+        K1_m <- K1_m / tr(K1_m)
+        K2_m <- K2_m / tr(K2_m)
+      }
+      
+      K <- K1_m + K2_m
+      K_test <- K_test + u_weight[d] * K
+    }
+    
+    SSE_test <- sum((fit_test$Y - beta0 - K_test %*% alpha0) ^ 2)
+    test_RMSE <- sqrt(SSE_test / n)
+    
+  } else {
+    test_RMSE <- -1
+  }
+  
+  train_RMSE <- sqrt(noise_hat$SSE / n)
+  
+  V0_inv <-
+    compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)$V0_inv
+  
+  list(pvalue = pvalue, u_weight = u_weight, 
+       lam = lam, train_RMSE = train_RMSE, 
+       test_RMSE  = test_RMSE, K_tr = tr(K_gpr), 
+       A_tr = tr(noise_hat$A), V0_inv_tr = tr(V0_inv),
+       K_gpr = K_gpr, A = noise_hat$A, V0_inv = V0_inv)
 }
 
 
@@ -143,7 +191,7 @@ test_asym <- function(n, Y, X12, beta0, alpha0,
                       K_gpr, sigma2_hat, tau_hat, B) {
   
   score_chi <-
-    compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)
+    compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)$test_stat
   
   K0 <- K_gpr
   K12 <- X12 %*% t(X12)
@@ -224,14 +272,18 @@ test_boot <- function(n, Y, X12, beta0, alpha0,
                       K_gpr, sigma2_hat, tau_hat, B) {
   
   meanY <- K_gpr %*% alpha0 + beta0
+  lam_star <- sigma2_hat / tau_hat
   bs_test <- sapply(1:B, function(k) {
+    
     Ystar <- meanY + rnorm(n, sd = sqrt(sigma2_hat))
-    compute_stat(n, Ystar, X12, beta0, K_gpr, sigma2_hat, tau_hat)
+    sigma2_star <- estimate_noise(Ystar, lam_star, beta0, alpha0, K_gpr)$sigma2_hat
+    tau_star <- sigma2_star / lam_star
+    compute_stat(n, Ystar, X12, beta0, K_gpr, sigma2_star, tau_star)$test_stat
   })
   
   # assemble test statistic
   original_test <-
-    compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)
+    compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)$test_stat
   
   pvalue <- sum(as.numeric(original_test) <= bs_test) / B
   

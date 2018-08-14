@@ -24,6 +24,8 @@ types of factors in the dataframe.}
 }
 \value{
 \item{test_stat}{(numeric) The computed test statistic.}
+
+\item{V0_inv}{(numeric) The computed test statistic.}
 }
 \description{
 Compute score test statistics.

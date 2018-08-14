@@ -63,10 +63,6 @@ generate_formula <-
 
 
 
-
-
-
-
 #' Generating Original Data
 #'
 #' Generate original data based on specific kernels.
@@ -151,9 +147,6 @@ generate_data <-
 
 
 
-
-
-
 #' Estimating Noise
 #'
 #' An implementation of Gaussian processes for estimating noise.
@@ -167,6 +160,10 @@ generate_data <-
 #' ensemble kernel matrix.
 #' @param K_hat (matrix, n*n) Estimated ensemble kernel matrix.
 #' @return \item{sigma2_hat}{(numeric) The estimated noise of the fixed effects.}
+#' 
+#' \item{SSE}{(numeric) The estimated noise of the fixed effects.}
+#' 
+#' \item{A}{(matrix) The estimated noise of the fixed effects.}
 #' @author Wenying Deng
 #' @references Jeremiah Zhe Liu and Brent Coull. Robust Hypothesis Test for
 #' Nonlinear Effect with Gaus- sian Processes. October 2017.
@@ -185,15 +182,11 @@ estimate_noise <- function(Y, lambda_hat, beta_hat, alpha_hat, K_hat) {
   Px <- one %*% ginv(t(one) %*% ginv(V) %*% one) %*% t(one) %*% ginv(V)
   Pk <- K_hat %*% ginv(V) %*% (diag(n) - Px)
   A <- Px + Pk
-  sigma2_hat <- sum((Y - beta_hat - K_hat %*% alpha_hat) ^ 2) / (n - tr(A))
+  sigma2_hat <- sum((Y - beta_hat - K_hat %*% alpha_hat) ^ 2) / (n - tr(A) - 1)
+  SSE <- sum((Y - beta_hat - K_hat %*% alpha_hat) ^ 2)
   
-  sigma2_hat
+  list(sigma2_hat = sigma2_hat, SSE = SSE, A = A)
  }
-
-
-
-
-
 
 
 
@@ -212,6 +205,8 @@ estimate_noise <- function(Y, lambda_hat, beta_hat, alpha_hat, K_hat) {
 #' @param sigma2_hat (numeric) The estimated noise of the fixed effects.
 #' @param tau_hat (numeric) The estimated noise of the random effects.
 #' @return \item{test_stat}{(numeric) The computed test statistic.}
+#' 
+#' \item{V0_inv}{(numeric) The computed test statistic.}
 #' @author Wenying Deng
 #' @references Arnab Maity and Xihong Lin. Powerful tests for detecting a gene
 #' effect in the presence of possible gene-gene interactions using garrote
@@ -228,16 +223,20 @@ compute_stat <-
 
     K0 <- K_gpr
     K12 <- X12 %*% t(X12)
-
-    V0_inv <- ginv(tau_hat * K0 + sigma2_hat * diag(n))
-
-    test_stat <- tau_hat * t(Y - beta0) %*% V0_inv %*%
+    
+    # V0_inv <- ginv(tau_hat * K0 + sigma2_hat * diag(n))
+    
+    lam <- sigma2_hat / tau_hat
+    V0_inv <- ginv(K0 + lam * diag(n))
+    
+    # test_stat <- tau_hat * t(Y - beta0) %*% V0_inv %*%
+    #   K12 %*% V0_inv %*% (Y - beta0) / 2
+    
+    test_stat <- t(Y - beta0) %*% V0_inv %*% 
       K12 %*% V0_inv %*% (Y - beta0) / 2
-
-    test_stat
+    
+    list(test_stat = test_stat, V0_inv = V0_inv)
   }
-
-
 
 
 

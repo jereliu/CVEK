@@ -6,7 +6,7 @@
 \usage{
 testing(formula_int, label_names, Y, X1, X2, kern_list, mode = "loocv",
   strategy = "erm", beta = 1, test = "boot", lambda = exp(seq(-5, 5)),
-  B = 100)
+  B = 100, data_test = NULL, fit_test = NULL)
 }
 \arguments{
 \item{formula_int}{(formula) A symbolic description of the model with 
@@ -45,6 +45,16 @@ hen test = "boot".}
 }
 \value{
 \item{pvalue}{(numeric) p-value of the test.}
+\item{u_weight}{(numeric) p-value of the test.}
+\item{lam}{(numeric) p-value of the test.}
+\item{train_RMSE}{(numeric) p-value of the test.}
+\item{test_RMSE}{(numeric) p-value of the test.}
+\item{K_tr}{(numeric) p-value of the test.}
+\item{A_tr}{(numeric) p-value of the test.}
+\item{V0_inv_tr}{(numeric) p-value of the test.}
+\item{K_gpr}{(numeric) p-value of the test.}
+\item{A}{(numeric) p-value of the test.}
+\item{V0_inv}{(numeric) p-value of the test.}
 }
 \description{
 Conduct score tests comparing a fitted model and a more general alternative

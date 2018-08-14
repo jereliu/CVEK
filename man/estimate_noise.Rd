@@ -21,6 +21,10 @@ ensemble kernel matrix.}
 }
 \value{
 \item{sigma2_hat}{(numeric) The estimated noise of the fixed effects.}
+
+\item{SSE}{(numeric) The estimated noise of the fixed effects.}
+
+\item{A}{(matrix) The estimated noise of the fixed effects.}
 }
 \description{
 An implementation of Gaussian processes for estimating noise.
