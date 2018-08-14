@@ -46,6 +46,7 @@
 #' \item{K_tr}{(numeric) p-value of the test.}
 #' \item{A_tr}{(numeric) p-value of the test.}
 #' \item{V0_inv_tr}{(numeric) p-value of the test.}
+#' \item{K_eig}{(numeric) p-value of the test.}
 #' @author Wenying Deng
 #' @seealso method: \code{\link{generate_kernel}}
 #'
@@ -134,10 +135,13 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   V0_inv <-
     compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)$V0_inv
   
+  K_eig <- svd(K_gpr)$d
+  
   list(pvalue = pvalue, u_weight = u_weight, 
        lam = lam, train_RMSE = train_RMSE, 
        test_RMSE  = test_RMSE, K_tr = tr(K_gpr), 
-       A_tr = tr(noise_hat$A), V0_inv_tr = tr(V0_inv))
+       A_tr = tr(noise_hat$A), V0_inv_tr = tr(V0_inv),
+       K_eig = K_eig)
 }
 
 
