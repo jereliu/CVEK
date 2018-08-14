@@ -52,9 +52,6 @@ hen test = "boot".}
 \item{K_tr}{(numeric) p-value of the test.}
 \item{A_tr}{(numeric) p-value of the test.}
 \item{V0_inv_tr}{(numeric) p-value of the test.}
-\item{K_gpr}{(numeric) p-value of the test.}
-\item{A}{(numeric) p-value of the test.}
-\item{V0_inv}{(numeric) p-value of the test.}
 }
 \description{
 Conduct score tests comparing a fitted model and a more general alternative
