@@ -110,7 +110,7 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   if (!is.null(data_test) & !is.null(fit_test)) {
     
     kern_size <- length(kern_list)
-    K_test <- NULL
+    K_test <- 0
     for (d in seq(kern_size)) {
       kern <- kern_list[[d]]
       K1_m <- kern(fit_test$X1, X1)
