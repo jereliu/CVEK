@@ -114,12 +114,7 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
       K1_m <- kern(fit_test$X1, X1)
       K2_m <- kern(fit_test$X2, X2)
       
-      if (tr(K1_m) > 0 & tr(K2_m) > 0) {
-        K1_m <- K1_m / tr(K1_m)
-        K2_m <- K2_m / tr(K2_m)
-      }
-      
-      K <- K1_m + K2_m
+      K <- (K1_m + K2_m) / tr(K1_m + K2_m)
       K_test <- K_test + u_weight[d] * K
     }
     
@@ -139,9 +134,9 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   
   list(pvalue = pvalue, u_weight = u_weight, 
        lam = lam, train_RMSE = train_RMSE, 
-       test_RMSE  = test_RMSE, K_tr = tr(K_gpr), 
-       A_tr = tr(noise_hat$A), V0_inv_tr = tr(V0_inv),
-       K_eig = K_eig)
+       test_RMSE  = test_RMSE, trtst_ratio = train_RMSE / test_RMSE, 
+       K_tr = tr(K_gpr), A_tr = tr(noise_hat$A), 
+       V0_inv_tr = tr(V0_inv), K_eig = K_eig)
 }
 
 
