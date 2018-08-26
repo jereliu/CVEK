@@ -239,9 +239,11 @@ tuning_gmpml <-
     CV <- sapply(lambda, function(k){
       
       A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
+      det_log <- unlist(determinant((diag(n) - A), 
+                                    logarithm = TRUE), use.names = FALSE)[1]
       
       log(t(Y) %*% (diag(n) - A) %*% Y) -
-        1 / (n - 1) * log(det((diag(n) - A)))
+        1 / (n - 1) * det_log
     })
     
     lambda[which(CV == min(CV))]
