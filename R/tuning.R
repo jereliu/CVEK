@@ -239,11 +239,11 @@ tuning_gmpml <-
     CV <- sapply(lambda, function(k){
       
       A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
-      det_log <- unlist(determinant((diag(n) - A), 
-                                    logarithm = TRUE), use.names = FALSE)[1]
+      A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      log_det <- unlist(determinant(diag(n) - A_kernel_only), 
+                        use.names = FALSE)[1]
       
-      log(t(Y) %*% (diag(n) - A) %*% Y) -
-        1 / (n - 1) * det_log
+      log(t(Y) %*% (diag(n) - A) %*% Y) - 1 / (n - 1) * log_det
     })
     
     lambda[which(CV == min(CV))]
@@ -304,4 +304,3 @@ tuning_loocv <-
     
     lambda[which(CV == min(CV))]
   }
-
