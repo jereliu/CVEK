@@ -127,10 +127,10 @@ tuning_AICc <-
     CV <- sapply(lambda, function(k) {
       
       A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
-      A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
       
       log(t(Y) %*% (diag(n) - A) %*% (diag(n) - A) %*% Y) +
-        2 * (tr(A_kernel_only) + 2) / (n - tr(A_kernel_only) - 3)
+        2 * (tr(A) + 2) / (n - tr(A) - 3)
     })
     
     lambda[which(CV == min(CV))]
@@ -184,10 +184,10 @@ tuning_GCVc <-
     CV <- sapply(lambda, function(k) {
       
       A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
-      A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
       
       log(t(Y) %*% (diag(n) - A) %*% (diag(n) - A) %*% Y) -
-        2 * log(max(0, 1 - tr(A_kernel_only) / n - 2 / n))
+        2 * log(max(0, 1 - tr(A) / n - 2 / n))
     })
     
     lambda[which(CV == min(CV))]
@@ -300,9 +300,9 @@ tuning_loocv <-
     CV <- sapply(lambda, function(k) {
       
       A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
-      A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
       
-      sum(((diag(n) - A) %*% Y / diag(diag(n) - A_kernel_only)) ^ 2)
+      sum(((diag(n) - A) %*% Y / diag(diag(n) - A)) ^ 2)
     })
     
     lambda[which(CV == min(CV))]
