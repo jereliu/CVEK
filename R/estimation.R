@@ -124,10 +124,10 @@ estimate_base <- function(n, kern_size, Y, X1, X2,
       lambda0 <- tuning(Y, K, mode, lambda)
       K1 <- cbind(1, K)
       K2 <- cbind(0, rbind(0, K))
-      theta <- ginv(lambda0 * K2 + t(K1) %*% K1) %*% t(K1) %*% Y
-      beta0 <- theta[1]
-      M <- K %*% ginv(K + lambda0 * diag(n))
-      error_mat[, d] <- (diag(n) - M) %*% (Y - beta0) / diag(diag(n) - M)
+      # theta <- ginv(lambda0 * K2 + t(K1) %*% K1) %*% t(K1) %*% Y
+      # beta0 <- theta[1]
+      M <- K1 %*% ginv(t(K1) %*% K1 + lambda0 * K2) %*% t(K1)
+      error_mat[, d] <- (diag(n) - M) %*% Y / diag(diag(n) - M)
       A_hat[[d]] <- M
     }
   }
