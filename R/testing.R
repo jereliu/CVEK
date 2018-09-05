@@ -76,7 +76,7 @@
 
 testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
                     mode = "loocv", strategy = "erm", beta = 1,
-                    test = "boot", lambda = exp(seq(-5, 5)), 
+                    test = "boot", lambda_list = exp(seq(-5, 5)), 
                     B = 100, data_test = NULL, fit_test = NULL) {
   
   re <- generate_formula(formula_int, label_names)
@@ -88,14 +88,16 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   X12 <- X[, c((len + 1):dim(X)[2])]
   n <- length(Y)
   
-  result <- estimation(Y, X1, X2, kern_list, mode, strategy, beta, lambda)
-  lam <- result[[1]]
-  beta0 <- result[[2]]
-  alpha0 <- result[[3]]
-  K_gpr <- result[[4]]
-  u_weight <- result[[5]]
-  noise_hat <- estimate_noise(Y, lam, beta0, alpha0, K_gpr)
-  tau_hat <- noise_hat$sigma2_hat / lam
+  result <- estimation(Y, X1, X2, kern_list, mode, strategy, beta, lambda_list)
+  lambda <- result$lambda
+  beta0 <- result$beta[1, 1]
+  alpha0 <- result$alpha
+  K_gpr <- result$K
+  u_weight <- result$u_hat
+  base_est <- result$base_est
+  
+  noise_hat <- estimate_noise(Y, lambda, beta0, alpha0, K_gpr)
+  tau_hat <- noise_hat$sigma2_hat / lambda
   
   test <- match.arg(test, c("asym", "boot"))
   func_name <- paste0("test_", test)
@@ -108,24 +110,27 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   if (!is.null(data_test) & !is.null(fit_test)) {
     
     kern_size <- length(kern_list)
-    K_test <- 0
+    Yhat_test <- 0
     for (d in seq(kern_size)) {
       kern <- kern_list[[d]]
       K1_m <- kern(fit_test$X1, X1)
       K2_m <- kern(fit_test$X2, X2)
+      K_test <- K1_m + K2_m
       
-      K <- (K1_m + K2_m) / tr(K1_m + K2_m)
-      K_test <- K_test + u_weight[d] * K
+      Yhat_base <- base_est$beta_list[[d]][1, 1] + 
+        K_test %*% base_est$alpha_list[[d]]
+      Yhat_test <- Yhat_test + u_weight[d] * Yhat_base
     }
     
-    SSE_test <- sum((fit_test$Y - beta0 - K_test %*% alpha0) ^ 2)
+    SSE_test <- sum((fit_test$Y - Yhat_test) ^ 2)
     test_RMSE <- sqrt(SSE_test / n)
     
   } else {
     test_RMSE <- -1
   }
   
-  train_RMSE <- sqrt(noise_hat$SSE / n)
+  SSE_train <- sum((Y - beta0 - K_gpr %*% alpha0) ^ 2)
+  train_RMSE <- sqrt(SSE_train / n)
   
   V0_inv <-
     compute_stat(n, Y, X12, beta0, K_gpr, sigma2_hat, tau_hat)$V0_inv
@@ -133,7 +138,7 @@ testing <- function(formula_int, label_names, Y, X1, X2, kern_list,
   K_eig <- svd(K_gpr)$d
   
   list(pvalue = pvalue, u_weight = u_weight, 
-       lam = lam, train_RMSE = train_RMSE, 
+       lambda = lambda, train_RMSE = train_RMSE, 
        test_RMSE  = test_RMSE, trtst_ratio = train_RMSE / test_RMSE, 
        K_tr = tr(K_gpr), A_tr = tr(noise_hat$A), 
        V0_inv_tr = tr(V0_inv), K_eig = K_eig)
