@@ -122,20 +122,22 @@ tuning_AICc <-
   function(Y, K_mat, lambda) {
     
     n <- nrow(K_mat)
-    K1 <- cbind(1, K_mat)
-    K2 <- cbind(0, rbind(0, K_mat))
+    # K1 <- cbind(1, K_mat)
+    # K2 <- cbind(0, rbind(0, K_mat))
     CV <- sapply(lambda, function(k) {
       
-      A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
+      # A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
       # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
-      
+      proj_matrix <- 
+        estimate_ridge(X = matrix(1, nrow = n, ncol = 1),
+                       K = K_mat, Y = Y, lambda = k)$proj_matrix
+      A <- proj_matrix$total
       log(t(Y) %*% (diag(n) - A) %*% (diag(n) - A) %*% Y) +
         2 * (tr(A) + 2) / (n - tr(A) - 3)
     })
     
     lambda[which(CV == min(CV))]
   }
-
 
 
 #' Calculating Tuning Parameters Using GCVc
@@ -179,12 +181,16 @@ tuning_GCVc <-
   function(Y, K_mat, lambda) {
     
     n <- nrow(K_mat)
-    K1 <- cbind(1, K_mat)
-    K2 <- cbind(0, rbind(0, K_mat))
+    # K1 <- cbind(1, K_mat)
+    # K2 <- cbind(0, rbind(0, K_mat))
     CV <- sapply(lambda, function(k) {
       
-      A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
+      # A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
       # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      proj_matrix <- 
+        estimate_ridge(X = matrix(1, nrow = n, ncol = 1),
+                       K = K_mat, Y = Y, lambda = k)$proj_matrix      
+      A <- proj_matrix$total
       
       log(t(Y) %*% (diag(n) - A) %*% (diag(n) - A) %*% Y) -
         2 * log(max(0, 1 - tr(A) / n - 2 / n))
@@ -236,15 +242,18 @@ tuning_gmpml <-
   function(Y, K_mat, lambda) {
     
     n <- nrow(K_mat)
-    K1 <- cbind(1, K_mat)
-    K2 <- cbind(0, rbind(0, K_mat))
+    # K1 <- cbind(1, K_mat)
+    # K2 <- cbind(0, rbind(0, K_mat))
     CV <- sapply(lambda, function(k){
       
-      A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
+      # A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
       A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
       log_det <- unlist(determinant(diag(n) - A_kernel_only), 
                         use.names = FALSE)[1]
-      
+      proj_matrix <- 
+        estimate_ridge(X = matrix(1, nrow = n, ncol = 1),
+                       K = K_mat, Y = Y, lambda = k)$proj_matrix      
+      A <- proj_matrix$total
       log(t(Y) %*% (diag(n) - A) %*% Y) - 1 / (n - 1) * log_det
     })
     
@@ -295,12 +304,11 @@ tuning_loocv <-
   function(Y, K_mat, lambda) {
     
     n <- nrow(K_mat)
-    K1 <- cbind(1, K_mat)
-    K2 <- cbind(0, rbind(0, K_mat))
     CV <- sapply(lambda, function(k) {
-      
-      A <- K1 %*% ginv(t(K1) %*% K1 + k * K2) %*% t(K1)
-      # A_kernel_only <- K_mat %*% ginv(K_mat + k * diag(n))
+      proj_matrix <- 
+        estimate_ridge(X = matrix(1, nrow = n, ncol = 1),
+                       K = K_mat, Y = Y, lambda = k)$proj_matrix      
+      A <- proj_matrix$total
       
       sum(((diag(n) - A) %*% Y / diag(diag(n) - A)) ^ 2)
     })
