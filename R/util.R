@@ -88,7 +88,7 @@ generate_formula <-
 #'
 #'
 #' data <- generate_data(n = 100, label_names =
-#' list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
+#' list(X1 = c("x1", "x2"), X2 = c("x3", "x4")),
 #' method = "rbf", int_effect = 0, l = 1, p = 2, eps = .01)
 #'
 #'
